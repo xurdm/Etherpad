@@ -9,7 +9,7 @@ LPWSTR get_clipboard_data(void);
 
 FILE *flog;
 
-int main(int argc, char **argv)
+int not_main(int argc, char **argv)
 {
 	LPWSTR data;
 
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		fwprintf(flog, "Error %d\r\n", data);
+		fprintf(flog, "Error. I don't know, dude.\r\n");
 	}
 
 	fclose(flog);

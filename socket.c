@@ -4,7 +4,9 @@
 #include <ws2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
 
-int init_socket()
+typedef enum { RESPONSE_OK, RESPONSE_NO, RESPONSE_SOMETHING_WEIRD_HAPPENED } SERVER_MSG;
+
+int main(int argc, char **argv)
 {
 	WSADATA wsa;
 	SOCKET s;
@@ -12,7 +14,8 @@ int init_socket()
 //	char *localhost = "127.0.0.1";
 	char *localhost = "74.125.226.36";
 	char *message, response[1024];
-	int recv_size;
+	SIZE_T recv_size;
+	SERVER_MSG msg;
 
 //WSAStartup()
 	puts("Calling WSAStartup() ...");
@@ -35,7 +38,7 @@ int init_socket()
 	addr.sin_port = htons(80);
 
 //connect()
-	printf("Connecting to %s...", localhost);
+	printf("Connecting to %s...\n", localhost);
 	if(connect(s, (struct sockaddr*)&addr, sizeof(addr)) < 0)
 	{
 		puts("Connection failed.");
@@ -54,13 +57,15 @@ int init_socket()
 	puts("Data sent.");
 
 //recv()
-	if((recv_size = recv(s, response, 2000, 0)) == SOCKET_ERROR)
+	if((recv_size = recv(s, response, 1024, 0)) == SOCKET_ERROR)
 	{
 		puts("Receive failed.");
 		return 1;
 	}
 	puts("Reply received:");
-	response[recv_size] = '\0';
+
+	response[recv_size-1] = '\0';
+	fprintf(stdout, "%s", response);
 	puts(response);
 
 	closesocket(s);
@@ -68,3 +73,5 @@ int init_socket()
 
 	return 0;
 }
+
+int 
