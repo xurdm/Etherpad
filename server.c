@@ -1,12 +1,12 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS //inet_addr is deprecated and I don't care because fuck IPv6
-#include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include "etherpad.h"
 #pragma comment(lib, "ws2_32.lib")
 
 typedef enum { RESPONSE_OK, RESPONSE_NO, RESPONSE_SOMETHING_WEIRD_HAPPENED } SERVER_MSG;
 
-int _not_main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	WSADATA wsa;
 	SOCKET s, new_socket;
@@ -62,9 +62,20 @@ int _not_main(int argc, char **argv)
 
 		do
 		{
-			recv_size = recv(s, response, 1024, 0);
+			recv_size = recv(new_socket, response, 1024, 0);
 			if(recv_size > 0)
-				printf("Bytes received: %d\nResponse: %s\n", recv_size, response);
+			{
+				int srcBytes, clip_len;
+				char* bytes = response;
+				int bytes_len = strlen(response);
+				WCHAR* clip;
+
+				srcBytes = MultiByteToWideChar(CP_UTF8, 0, bytes, bytes_len, NULL, 0, NULL, NULL);
+				clip = (WCHAR*)malloc(srcBytes);
+				clip_len = MultiByteToWideChar(CP_UTF8, 0, bytes, bytes_len, clip, srcBytes, NULL, NULL);
+
+				printf("Bytes received: %d\nClient message: %.*S\nLast error: %d\n", recv_size, clip_len, clip, WSAGetLastError());
+			}
 			else if(recv_size == 0)
 				puts("Connection closed.");
 			else
@@ -79,12 +90,12 @@ int _not_main(int argc, char **argv)
 		return 1;
 	}
 	/*** /server ***/
-	
-	system("pause");
 
 //	fclose(stdout);
 	closesocket(s);
 	WSACleanup();
+
+	//system("pause");
 
 	return 0;
 }

@@ -1,7 +1,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS //inet_addr is deprecated and I don't care because fuck IPv6
-#include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include "etherpad.h"
 #pragma comment(lib, "ws2_32.lib")
 
 typedef enum { RESPONSE_OK, RESPONSE_NO, RESPONSE_SOMETHING_WEIRD_HAPPENED } SERVER_MSG;
@@ -11,12 +11,12 @@ int main(int argc, char **argv)
 	WSADATA wsa;
 	SOCKET s, new_socket;
 	struct sockaddr_in server, client;
-	char *localhost = "127.0.0.1";
-	char *message, response[1024];
-	SIZE_T recv_size;
-	SERVER_MSG msg;
-	SIZE_T c;
-	FILE *fstdout;
+	char* localhost = "127.0.0.1";
+	char* message, response[1024];
+	SIZE_T recv_size, c, clip_len, bytes_len;
+	FILE* fstdout;
+	WCHAR* clip;
+	char* bytes;
 
 //	freopen_s(&fstdout, "console.log", "w", stdout);	//redirect stdout to log file. TODO: error check
 
@@ -56,17 +56,22 @@ int main(int argc, char **argv)
 		puts("Receive failed.");
 		return 1;
 	}
-	puts("Reply received:");
+	printf("Message from server: %.*s\n", recv_size, response);
 
-	response[recv_size-1] = '\0';
-	puts(response);
+	//convert unicode string to byte string and send to server
+	clip = get_clipboard_data();
+	clip_len = wcslen(clip);
+	int srcBytes = WideCharToMultiByte(CP_UTF8, 0, clip, clip_len, NULL, 0, NULL, NULL);
+	bytes = (char*)malloc(srcBytes);
+	bytes_len = WideCharToMultiByte(CP_UTF8, 0, clip, clip_len, bytes, srcBytes, NULL, NULL);
+	send(s, bytes, bytes_len, 0);
+
 	/*** /client ***/
-	
-	getchar();
-
 //	fclose(stdout);
 	closesocket(s);
 	WSACleanup();
+
+	system("pause");
 
 	return 0;
 }

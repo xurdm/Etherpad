@@ -1,13 +1,8 @@
 #include <windows.h>
 #include <string.h>
 #include <direct.h>
-#include <stdio.h>
 #include <wchar.h>
-
-int set_clipboard_data(LPWSTR);
-LPWSTR get_clipboard_data(void);
-
-FILE *flog;
+#include "etherpad.h"
 
 int not_main(int argc, char **argv)
 {
