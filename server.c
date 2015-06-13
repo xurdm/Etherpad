@@ -56,11 +56,13 @@ int main(int argc, char **argv)
 		do
 		{
 			recv_size = recv(new_socket, response, 1024, 0);
+			printf("data size: %d\n", recv_size);
+			fflush(stdout);
 			if(recv_size > 0)
 			{
 				int srcBytes, clip_len;
 				char* bytes = response;
-				int bytes_len = strlen(response);
+				int bytes_len = recv_size;
 				WCHAR* clip;
 
 				srcBytes = MultiByteToWideChar(CP_UTF8, 0, bytes, bytes_len, NULL, 0);
