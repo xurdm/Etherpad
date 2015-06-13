@@ -20,7 +20,6 @@ int main(int argc, char **argv)
 
 //	freopen_s(&fstdout, "console.log", "w", stdout);	//redirect stdout to log file. TODO: error check
 
-//WSAStartup()
 	puts("Calling WSAStartup() ...");
 	if(WSAStartup(MAKEWORD(2,2), &wsa) != 0)
 	{
@@ -29,7 +28,6 @@ int main(int argc, char **argv)
 	}
 	puts("WSAStartup() successful.");
 
-//socket()
 	if((s = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
 		printf("Failed to create socket: %d", WSAGetLastError());
@@ -40,8 +38,6 @@ int main(int argc, char **argv)
 	server.sin_addr.s_addr = inet_addr(localhost);
 	server.sin_port = htons(3028);
 
-	/*** client ***/
-//connect
 	printf("Connecting to %s...\n", localhost);
 	if(connect(s, (struct sockaddr*)&server, sizeof(server)) < 0)
 	{
@@ -50,13 +46,12 @@ int main(int argc, char **argv)
 	}
 	puts("Connected.");
 
-//recv
 	if((recv_size = recv(s, response, 1024, 0)) == SOCKET_ERROR)
 	{
 		puts("Receive failed.");
 		return 1;
 	}
-	printf("Message from server: %.*s\n", recv_size, response);
+	//printf("Message from server: %.*s\n", recv_size, response);
 
 	//convert unicode string to byte string and send to server
 	clip = get_clipboard_data();
@@ -66,7 +61,6 @@ int main(int argc, char **argv)
 	bytes_len = WideCharToMultiByte(CP_UTF8, 0, clip, clip_len, bytes, srcBytes, NULL, NULL);
 	send(s, bytes, bytes_len, 0);
 
-	/*** /client ***/
 //	fclose(stdout);
 	closesocket(s);
 	WSACleanup();
