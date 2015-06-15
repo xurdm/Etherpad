@@ -11,11 +11,13 @@ int main(int argc, char **argv)
 	WSADATA wsa;
 	SOCKET s, new_socket;
 	struct sockaddr_in server, client;
-	char *message, response[1024];
+	char* message;
+	char response[1024];
 	SIZE_T recv_size;
 	SERVER_MSG msg;
 	SIZE_T c;
 	FILE *fstdout;
+	WCHAR* current_clip;
 
 //	freopen_s(&fstdout, "console.log", "w", stdout);	//redirect stdout to log file. TODO: error check
 
@@ -57,7 +59,7 @@ int main(int argc, char **argv)
 		{
 			recv_size = recv(new_socket, response, 1024, 0);
 			printf("data size: %d\n", recv_size);
-			fflush(stdout);
+
 			if(recv_size > 0)
 			{
 				int srcBytes, clip_len;
@@ -66,10 +68,16 @@ int main(int argc, char **argv)
 				WCHAR* clip;
 
 				srcBytes = MultiByteToWideChar(CP_UTF8, 0, bytes, bytes_len, NULL, 0);
-				clip = (WCHAR*)malloc(srcBytes);
+				clip = (WCHAR*)calloc(srcBytes, sizeof(WCHAR)); //check ret
 				clip_len = MultiByteToWideChar(CP_UTF8, 0, bytes, bytes_len, clip, srcBytes);
+				clip[clip_len-1] = 0;
 
-				wprintf("Bytes received: %d\nClient message: %ls\nLast error: %d\n", recv_size, clip, WSAGetLastError());
+				for(int i = 0; i < clip_len; ++i)
+					wprintf(L"%lc", clip[i]);
+
+				wprintf("Bytes received: %d\nLast error: %d\n", recv_size, WSAGetLastError());
+
+				free(clip);
 			}
 			else if(recv_size == 0)
 				puts("Connection closed.");
@@ -88,6 +96,6 @@ int main(int argc, char **argv)
 //	fclose(stdout);
 	closesocket(s);
 	WSACleanup();
-
+	system("pause");
 	return 0;
 }

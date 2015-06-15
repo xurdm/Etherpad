@@ -46,11 +46,15 @@ int main(int argc, char **argv)
 	}
 	puts("Connected.");
 
+// 	this function causes the program to lock up and never proceed
+//	remove it
+/*
 	if((recv_size = recv(s, response, 1024, 0)) == SOCKET_ERROR)
 	{
 		puts("Receive failed.");
 		return 1;
 	}
+*/
 	//printf("Message from server: %.*s\n", recv_size, response);
 
 	//convert unicode string to byte string and send to server
@@ -61,11 +65,11 @@ int main(int argc, char **argv)
 	bytes_len = WideCharToMultiByte(CP_UTF8, 0, clip, clip_len, bytes, srcBytes, NULL, NULL);
 	send(s, bytes, bytes_len, 0);
 
-//	fclose(stdout);
+//	fclose(stdout)	;
 	closesocket(s);
 	WSACleanup();
 
 	system("pause");
 
 	return 0;
-}w
+}
