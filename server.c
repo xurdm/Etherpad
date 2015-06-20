@@ -4,19 +4,15 @@
 #include "etherpad.h"
 #pragma comment(lib, "ws2_32.lib")
 
-typedef enum { RESPONSE_OK, RESPONSE_NO, RESPONSE_SOMETHING_WEIRD_HAPPENED } SERVER_MSG;
-
 int main(int argc, char **argv)
 {
 	WSADATA wsa;
 	SOCKET s, new_socket;
 	struct sockaddr_in server, client;
-	char* message;
 	char response[1024];
 	SIZE_T recv_size;
-	SERVER_MSG msg;
 	SIZE_T c;
-	FILE *fstdout;
+//	FILE *fstdout;
 	WCHAR* current_clip;
 
 //	freopen_s(&fstdout, "console.log", "w", stdout);	//redirect stdout to log file. TODO: error check
@@ -58,7 +54,6 @@ int main(int argc, char **argv)
 		do
 		{
 			recv_size = recv(new_socket, response, 1024, 0);
-			printf("data size: %d\n", recv_size);
 
 			if(recv_size > 0)
 			{
@@ -67,15 +62,16 @@ int main(int argc, char **argv)
 				int bytes_len = recv_size;
 				WCHAR* clip;
 
+				//interpret byte string as unicode string
 				srcBytes = MultiByteToWideChar(CP_UTF8, 0, bytes, bytes_len, NULL, 0);
 				clip = (WCHAR*)calloc(srcBytes, sizeof(WCHAR)); //check ret
 				clip_len = MultiByteToWideChar(CP_UTF8, 0, bytes, bytes_len, clip, srcBytes);
-				clip[clip_len-1] = 0;
 
+				//print client clipboard data
+				printf("Bytes received: %d\nLast error: %d\nClipboard data: ", recv_size, WSAGetLastError());
 				for(int i = 0; i < clip_len; ++i)
 					wprintf(L"%lc", clip[i]);
-
-				wprintf("Bytes received: %d\nLast error: %d\n", recv_size, WSAGetLastError());
+				puts("");
 
 				free(clip);
 			}
