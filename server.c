@@ -1,4 +1,4 @@
-#define _WINSOCK_DEPRECATED_NO_WARNINGS //inet_addr is deprecated and I don't care because fuck IPv6
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include "etherpad.h"
